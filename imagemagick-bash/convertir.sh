@@ -1,9 +1,12 @@
 #!/bin/bash
+##
+#Recibe dos parametros: /Directorio/raiz/ /directorio/destino
+##
+
 #Tomamos dir raiz y dir destino
 DIR=$1;
 DEST=$2;
-#Accedemos al dir raiz
-cd $DIR;
+
 #Metodo con un for que convierte y copia las imagenes
 convertir(){
 	#Para que el listado de archivos sea archivo por linea
@@ -30,34 +33,46 @@ convertir(){
 	done;
 }
 
-#Validamos que el directorio raiz existe
-if [ -d $DIR ];
+#validamos que haya parametros
+if [ -n "$DIR" -a -n "$DEST" ];
 then
-	#Si exste valida que el dir destino tambien exista
-	if [ -d $DEST ];
+	#Validamos que el directorio raiz existe
+	if [ -d $DIR ];
 	then
-		#Si existe el destino llama el metodo convertir que crea las imagenes
-		convertir;
-	else
-		#Manda el mensaje que el directorio destio no existe
-		echo "¿Quieres crear el directorio "$DEST" ? [y/n]";
-		read resp;
-		#Si la respuesta es si creamos el dir
-		if [ $resp = "y" ];
+		#Si exste valida que el dir destino tambien exista
+		if [ -d $DEST ];
 		then
-			#Si se crea el destino llama el metodo, si no manda el error
-			echo "Creando: "$DEST;
-			if ( mkdir $DEST );
-			then
-				convertir;
-			else
-				echo "No se pudo crear "$DEST;
-			fi
+			#Accedemos al dir raiz
+			cd $DIR;
+			#Si existe el destino llama el metodo convertir que crea las imagenes
+			convertir;
 		else
-			echo "El directorio destino no existe";
+			#Manda el mensaje que el directorio destio no existe
+			echo "¿Quieres crear el directorio "$DEST" ? [y/n]";
+			read resp;
+			#Si la respuesta es si creamos el dir
+			if [ $resp = "y" ];
+			then
+				#Si se crea el destino llama el metodo, si no manda el error
+				echo "Creando: "$DEST;
+				if ( mkdir $DEST );
+				then
+					#Accedemos al dir raiz
+					cd $DIR;
+					convertir;
+				else
+					echo "No se pudo crear "$DEST;
+				fi
+			else
+				echo "El directorio destino no existe";
+			fi
 		fi
+	else
+		#Manda el mensaje porque el directorio raiz no existe
+		echo "El Directorio no existe";
 	fi
 else
-	#Manda el mensaje porque el directorio raiz no existe
-	echo "El Directorio no existe";
+	echo "Hace falta directorio raiz o directorio destino:"
+	echo "Ejemplo:"
+	echo "sh convertir.sh /directorio/raiz/ /directorio/destino"
 fi
